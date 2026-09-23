@@ -177,19 +177,48 @@ async function sendMessage() {
     "ai"
   );
 
-  /*
-    ขั้นต่อไปเราจะเชื่อม OpenAI API ตรงนี้
-  */
+  try {
 
-  setTimeout(() => {
+    const response = await fetch("/api/chat", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        message: text
+      })
+
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "เกิดข้อผิดพลาด"
+      );
+    }
 
     aiMessage.textContent =
-      "ตอนนี้หน้า AI พร้อมแล้วครับ 🚀\n\n" +
-      "ขั้นต่อไปเราจะเชื่อม OpenAI ให้ผมสามารถตอบคำถามจริงได้";
+      data.reply || "AI ไม่มีคำตอบ";
+
+  } catch (error) {
+
+    console.error(error);
+
+    aiMessage.textContent =
+      "❌ เกิดข้อผิดพลาด: " +
+      error.message;
+
+  } finally {
 
     button.disabled = false;
 
-  }, 500);
+    input.focus();
+
+  }
 }
 
 button.addEventListener(
