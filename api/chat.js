@@ -6,7 +6,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body;
+    const {
+      message,
+      mode,
+      history = []
+    } = req.body;
 
     if (!message || !message.trim()) {
       return res.status(400).json({
@@ -14,40 +18,73 @@ export default async function handler(req, res) {
       });
     }
 
+    const systemInstruction =
+      mode ||
+      "คุณเป็นผู้ช่วย AI ทั่วไป ตอบคำถามให้ชัดเจน กระชับ และเป็นประโยชน์";
+
+    const conversation = history
+      .slice(-20)
+      .map(item => ({
+        role: item.type === "user"
+          ? "user"
+          : "assistant",
+        content: item.text
+      }));
+
+    conversation.push({
+      role: "user",
+      content: message
+    });
+
     const response = await fetch(
       "https://api.openai.com/v1/responses",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+          "Authorization":
+            `Bearer ${process.env.OPENAI_API_KEY}`
         },
+
         body: JSON.stringify({
           model: "gpt-5.6-luna",
-          input: message
+
+          instructions:
+            systemInstruction,
+
+          input:
+            conversation
         })
       }
     );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     if (!response.ok) {
       console.error(data);
 
       return res.status(response.status).json({
-        error: data.error?.message || "OpenAI API error"
+        error:
+          data.error?.message ||
+          "OpenAI API error"
       });
     }
 
     return res.status(200).json({
-      reply: data.output_text || "AI ไม่มีคำตอบ"
+      reply:
+        data.output_text ||
+        "AI ไม่มีคำตอบ"
     });
 
   } catch (error) {
+
     console.error(error);
 
     return res.status(500).json({
-      error: "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์"
+      error:
+        "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์"
     });
   }
 }
