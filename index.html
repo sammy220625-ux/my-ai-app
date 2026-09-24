@@ -775,17 +775,21 @@ async function sendMessage() {
 
           },
 
-          body:
-            JSON.stringify({
+      body:
+  JSON.stringify({
 
-              message:
-                text,
+    message: text,
 
-              mode:
-                modes[selectedMode]
+    mode: modes[selectedMode],
 
-            })
+    history: JSON.parse(
+      localStorage.getItem(
+        STORAGE_KEY
+      ) || "[]"
+    )
 
+  })
+          
         }
       );
 
