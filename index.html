@@ -744,6 +744,46 @@ async function sendMessage() {
   const selectedMode =
     modeSelect.value;
 
+if (selectedMode === "demo") {
+
+  input.value = "";
+
+  button.disabled = true;
+
+  addMessage(
+    text,
+    "user"
+  );
+
+  const demoReplies = [
+    "🧪 นี่คือโหมดทดลองครับ ตอนนี้ API ยังไม่มีเครดิต แต่ระบบแชตทำงานได้ตามปกติ",
+    "🤖 ระบบได้รับข้อความของคุณแล้วครับ โหมดทดลองใช้สำหรับทดสอบหน้าตาและการทำงานของแอป",
+    "💡 เมื่อคุณเติมเครดิต API ในอนาคต โหมด AI จริงจะสามารถตอบคำถามได้",
+    "📚 คุณสามารถทดลองเปลี่ยนโหมด AI และส่งข้อความได้โดยไม่ต้องเสียค่า API"
+  ];
+
+  const reply =
+    demoReplies[
+      Math.floor(
+        Math.random() * demoReplies.length
+      )
+    ];
+
+  setTimeout(() => {
+
+    addMessage(
+      reply,
+      "ai"
+    );
+
+    button.disabled = false;
+
+    input.focus();
+
+  }, 700);
+
+  return;
+}
 
   input.value = "";
 
